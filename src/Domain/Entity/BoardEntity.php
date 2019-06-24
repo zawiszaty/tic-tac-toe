@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
 
 namespace App\Domain\Entity;
 
+use App\Domain\Exception\BusyBoardException;
 
 class BoardEntity
 {
     /**
-     * @var boolean
+     * @var bool
      */
     private $busy;
 
@@ -40,6 +42,9 @@ class BoardEntity
 
     public function choseField(string $player): void
     {
+        if ($this->isBusy()) {
+            throw new BusyBoardException();
+        }
         $this->busy = true;
         $this->player = $player;
     }

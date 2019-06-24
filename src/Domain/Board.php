@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
 
 namespace App\Domain;
 
-
 use App\Domain\Entity\BoardEntity;
+use App\Domain\Exception\WinnerException;
 use App\Domain\ValueObject\Move;
+use App\Domain\ValueObject\Player;
 
 class Board
 {
     /**
-     * @var array<BoardEntity>
+     * @var array<array<BoardEntity>>
      */
     private $entities;
 
@@ -24,9 +26,9 @@ class Board
         $this->entities = [
             [new BoardEntity(), new BoardEntity(), new BoardEntity()],
             [new BoardEntity(), new BoardEntity(), new BoardEntity()],
-            [new BoardEntity(), new BoardEntity(), new BoardEntity()]
+            [new BoardEntity(), new BoardEntity(), new BoardEntity()],
         ];
-        $this->currentPlayer = 'X';
+        $this->currentPlayer = Player::PLAYER_X;
     }
 
     public function draw(): array
@@ -40,22 +42,20 @@ class Board
 
     private function prepareForDrawing(): array
     {
-        $entities = [];
+        $entities = array_map(function (array $entity) {
+            $data = array_map(function (BoardEntity $boardEntity) {
+                return $boardEntity->getPlayer();
+            }, $entity);
 
-        foreach ($this->entities as $entity) {
-            $data = [];
-            /** @var BoardEntity $item */
-            foreach ($entity as $item) {
-                $data[] = $item->getPlayer();
-            }
-            $entities[] = $data;
-        }
+            return $data;
+        }, $this->entities);
 
         return $entities;
     }
 
     /**
      * @throws WinnerException
+     * @throws Exception\BusyBoardException
      */
     public function selectField(): void
     {
@@ -64,46 +64,6 @@ class Board
         $entity->choseField($this->currentPlayer);
         $this->checkIfWin();
         $this->changePlayer();
-    }
-
-    private function changePlayer()
-    {
-        if ($this->currentPlayer === 'X') {
-            $this->currentPlayer = '0';
-        } else {
-            $this->currentPlayer = 'X';
-        }
-    }
-
-    public function move(string $side): bool
-    {
-        switch ($side) {
-            case Move::RIGHT:
-                if ($this->selectedField[1] + 1 <= 2) {
-                    $this->selectedField[1] = $this->selectedField[1] + 1;
-                    return true;
-                }
-                break;
-            case Move::LEFT:
-                if ($this->selectedField[1] - 1 >= 0) {
-                    $this->selectedField[1] = $this->selectedField[1] - 1;
-                    return true;
-                }
-                break;
-            case Move::UP:
-                if ($this->selectedField[0] - 1 >= 0) {
-                    $this->selectedField[0] = $this->selectedField[0] - 1;
-                    return true;
-                }
-                break;
-            case Move::DOWN:
-                if ($this->selectedField[0] + 1 <= 2) {
-                    $this->selectedField[0] = $this->selectedField[0] + 1;
-                    return true;
-                }
-                break;
-        }
-        return false;
     }
 
     private function checkIfWin(): void
@@ -143,5 +103,50 @@ class Board
         ) {
             throw new WinnerException($this->currentPlayer);
         }
+    }
+
+    private function changePlayer()
+    {
+        if (Player::PLAYER_X === $this->currentPlayer) {
+            $this->currentPlayer = Player::PLAYER_O;
+        } else {
+            $this->currentPlayer = Player::PLAYER_X;
+        }
+    }
+
+    public function move(string $side): bool
+    {
+        switch ($side) {
+            case Move::RIGHT:
+                if ($this->selectedField[1] + 1 <= 2) {
+                    $this->selectedField[1] = $this->selectedField[1] + 1;
+
+                    return true;
+                }
+                break;
+            case Move::LEFT:
+                if ($this->selectedField[1] - 1 >= 0) {
+                    $this->selectedField[1] = $this->selectedField[1] - 1;
+
+                    return true;
+                }
+                break;
+            case Move::UP:
+                if ($this->selectedField[0] - 1 >= 0) {
+                    $this->selectedField[0] = $this->selectedField[0] - 1;
+
+                    return true;
+                }
+                break;
+            case Move::DOWN:
+                if ($this->selectedField[0] + 1 <= 2) {
+                    $this->selectedField[0] = $this->selectedField[0] + 1;
+
+                    return true;
+                }
+                break;
+        }
+
+        return false;
     }
 }

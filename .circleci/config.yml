@@ -1,0 +1,10 @@
+
+version: 2
+jobs:
+  build:
+    docker: # run the steps with Docker
+      - image: circleci/php:7.3.6-apache-stretch
+    steps:
+      - checkout
+      - run: composer install
+      - run: make test

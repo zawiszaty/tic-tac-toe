@@ -3,7 +3,9 @@
     "description": "tic tac toe game",
     "require": {},
     "require-dev": {
-        "phpunit/phpunit": "^8"
+        "phpunit/phpunit": "^8",
+        "friendsofphp/php-cs-fixer": "^2.15",
+        "phpstan/phpstan": "^0.11.8"
     },
     "autoload": {
         "psr-4": {
