@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Entity;
 
 use App\Domain\Exception\BusyBoardException;
+use App\Domain\ValueObject\Player;
 
 class BoardEntity
 {
@@ -14,7 +15,7 @@ class BoardEntity
     private $busy;
 
     /**
-     * @var string|null
+     * @var Player|null
      */
     private $player;
 
@@ -24,23 +25,17 @@ class BoardEntity
         $this->player = null;
     }
 
-    /**
-     * @return bool
-     */
     public function isBusy(): bool
     {
         return $this->busy;
     }
 
-    /**
-     * @return string
-     */
-    public function getPlayer(): ?string
+    public function getPlayer(): ?Player
     {
         return $this->player;
     }
 
-    public function choseField(string $player): void
+    public function choseField(Player $player): void
     {
         if ($this->isBusy()) {
             throw new BusyBoardException();

@@ -4,8 +4,14 @@ declare(strict_types=1);
 
 namespace App\Domain\ValueObject;
 
-class Player
+use MyCLabs\Enum\Enum;
+
+/**
+ * @method static Player PLAYER_X()
+ * @method static Player PLAYER_O()
+ */
+class Player extends Enum
 {
-    public const PLAYER_X = 'X';
-    public const PLAYER_O = '0';
+    private const PLAYER_X = 'X';
+    private const PLAYER_O = '0';
 }
