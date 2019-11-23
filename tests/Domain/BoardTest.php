@@ -21,11 +21,11 @@ class BoardTest extends TestCase
         $board = new Board(new BoardSize(3, 3));
         $board->selectField();
         $selectedField = $board->getSelectedField();
-        $entities      = $board->getFields();
+        $entities = $board->getFields();
         $currentPlayer = $board->getCurrentPlayer();
         /** @var Field $boardEntity */
         $boardEntity = $entities[$selectedField->getX()][$selectedField->getY()];
-        $player      = $boardEntity->getPlayer();
+        $player = $boardEntity->getPlayer();
         $this->assertNotNull($player);
         $this->assertTrue($player->equals(new Player('X')));
         $this->assertTrue($currentPlayer->equals(new Player('0')));

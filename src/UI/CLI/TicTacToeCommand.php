@@ -55,8 +55,8 @@ final class TicTacToeCommand extends Command
             $mappings[$key] = [$dir, 0];
         }
 
-
         system('stty cbreak -echo');
+        /** @var resource $stdin */
         $stdin = fopen('php://stdin', 'r');
         while (1)
         {
@@ -65,7 +65,7 @@ final class TicTacToeCommand extends Command
             $io->success(sprintf('Current Player is: %s', $board->getCurrentPlayer()->getValue()));
             $entities = $this->getEntitiesView($this->boardService->draw());
             $this->render($output, $entities);
-            $c = ord(fgetc($stdin));
+            $c = ord((string) fgetc($stdin));
 
             if (isset($mappings[$c]))
             {

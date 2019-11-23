@@ -23,9 +23,9 @@ class Board
 
     public function __construct(BoardSize $boardSize)
     {
-        $this->boardSize     = $boardSize;
+        $this->boardSize = $boardSize;
         $this->selectedField = new SelectedField(0, 0);
-        $this->fields        = $this->createEntities();
+        $this->fields = $this->createEntities();
         $this->currentPlayer = Player::PLAYER_X();
     }
 
@@ -42,16 +42,11 @@ class Board
     {
         $result = [];
 
-        foreach ($this->fields as $i => $row)
-        {
-            foreach ($row as $j => $cell)
-            {
-                if (null === $cell->getPlayer())
-                {
+        foreach ($this->fields as $i => $row) {
+            foreach ($row as $j => $cell) {
+                if (null === $cell->getPlayer()) {
                     $result[$i][$j] = 0;
-                }
-                else
-                {
+                } else {
                     $result[$i][$j] = $cell->getPlayer()->equals($this->currentPlayer) ? 1 : 0;
                 }
             }
@@ -63,23 +58,19 @@ class Board
 
         $this->sumRowPlayer($result);
 
-        if (3 === $result[0][0] + $result[1][1] + $result[2][2])
-        {
+        if (3 === $result[0][0] + $result[1][1] + $result[2][2]) {
             throw new WinnerException($this->currentPlayer);
         }
 
-        if (3 === $result[0][2] + $result[1][1] + $result[2][0])
-        {
+        if (3 === $result[0][2] + $result[1][1] + $result[2][0]) {
             throw new WinnerException($this->currentPlayer);
         }
     }
 
     private function sumRowPlayer(array $result)
     {
-        foreach ($result as $item)
-        {
-            if (3 === array_sum($item))
-            {
+        foreach ($result as $item) {
+            if (3 === array_sum($item)) {
                 throw new WinnerException($this->currentPlayer);
             }
         }
@@ -101,8 +92,7 @@ class Board
             || $selectedField->getX() < 0
             || $selectedField->getY() > ($this->boardSize->getY() - 1)
             || $selectedField->getY() < 0
-        )
-        {
+        ) {
             throw MoveException::fromCannotMove();
         }
         $this->selectedField = $selectedField;
@@ -127,10 +117,8 @@ class Board
     {
         $entities = [];
 
-        for ($i = 0; $i < $this->boardSize->getY(); $i++)
-        {
-            for ($j = 0; $j < $this->boardSize->getX(); $j++)
-            {
+        for ($i = 0; $i < $this->boardSize->getY(); ++$i) {
+            for ($j = 0; $j < $this->boardSize->getX(); ++$j) {
                 $entities[$i][] = new Field();
             }
         }

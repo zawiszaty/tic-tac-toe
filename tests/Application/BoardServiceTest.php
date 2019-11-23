@@ -1,6 +1,6 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 
 namespace Tests\Application;
 
@@ -26,7 +26,7 @@ class BoardServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->repo    = new BoardRepositoryRepository();
+        $this->repo = new BoardRepositoryRepository();
         $this->service = new BoardService($this->repo, new BoardPresenter());
     }
 
@@ -41,11 +41,10 @@ class BoardServiceTest extends TestCase
     {
         $this->service->create(3, 3);
         $this->service->move(new MoveRightAction());
-        $board         = $this->repo->get();
+        $board = $this->repo->get();
         $selectedField = $board->getSelectedField();
         $this->assertSame(1, $selectedField->getX());
     }
-
 
     public function test_it_select_field(): void
     {

@@ -6,13 +6,13 @@ namespace App;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\Application as ConsoleApplication;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
-use Symfony\Component\DependencyInjection\TaggedContainerInterface;
 
 final class Application extends ConsoleApplication
 {
-    /** @var TaggedContainerInterface */
+    /** @var ContainerBuilder */
     private $container;
     /** @var string */
     private $env;
@@ -30,7 +30,9 @@ final class Application extends ConsoleApplication
         $loader = new YamlFileLoader($this->container, new FileLocator(__DIR__.'/../config'));
         $loader->load('services.yaml');
         foreach ($this->container->findTaggedServiceIds('console') as $commandId => $command) {
-            $this->add($this->container->get($commandId));
+            /** @var Command $command */
+            $command = $this->container->get($commandId);
+            $this->add($command);
         }
     }
 }

@@ -6,7 +6,6 @@ namespace App\Infrastructure;
 
 use App\Domain\Board;
 use App\Domain\BoardRepositoryInterface;
-use Exception;
 
 final class BoardRepositoryRepository implements BoardRepositoryInterface
 {
@@ -24,6 +23,6 @@ final class BoardRepositoryRepository implements BoardRepositoryInterface
             return $this->board;
         }
 
-        throw new Exception('Board Not Found');
+        throw BoardNotFoundException::fromMissingBoard();
     }
 }

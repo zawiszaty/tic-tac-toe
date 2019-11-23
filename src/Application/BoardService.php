@@ -20,7 +20,7 @@ final class BoardService
     public function __construct(BoardRepositoryInterface $boardRepository, BoardPresenter $boardPresenter)
     {
         $this->boardRepository = $boardRepository;
-        $this->boardPresenter  = $boardPresenter;
+        $this->boardPresenter = $boardPresenter;
     }
 
     public function create(int $x, int $y): void
@@ -36,7 +36,7 @@ final class BoardService
 
     public function move(MoveActionInterface $action): void
     {
-        $board         = $this->boardRepository->get();
+        $board = $this->boardRepository->get();
         $selectedField = $action->move($board->getSelectedField());
         $board->move($selectedField);
         $this->boardRepository->add($board);
