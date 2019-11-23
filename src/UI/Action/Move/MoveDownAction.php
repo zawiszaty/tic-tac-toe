@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Policy\Move;
+namespace App\UI\Action\Move;
 
-use App\Domain\Exception\MoveException;
 use App\Domain\ValueObject\SelectedField;
 
-final class MoveDownPolicy implements MovePolicyInterface
+final class MoveDownAction implements MoveActionInterface
 {
     public function move(SelectedField $selectedField): SelectedField
     {
@@ -17,6 +16,6 @@ final class MoveDownPolicy implements MovePolicyInterface
             return new SelectedField($selectedField->getX(), $y);
         }
 
-        throw MoveException::fromCannotMove('down');
+        throw MoveException::fromCannotMove();
     }
 }

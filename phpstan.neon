@@ -1,3 +1,5 @@
 parameters:
 	autoload_files:
 		- vendor/autoload.php
+	excluded:
+		- vendor

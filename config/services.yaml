@@ -1,0 +1,20 @@
+services:
+    App\UI\CLI\TicTacToeCommand:
+        class: App\UI\CLI\TicTacToeCommand
+        arguments:
+            - '@app.application.board_service'
+        tags:
+            - { name: 'console' }
+
+    app.application.board_service:
+        class: App\Application\BoardService
+        arguments:
+        - '@app.infrastructure.board_repository_repository'
+        - '@app.infrastructure.presenter.board_presenter'
+
+
+    app.infrastructure.board_repository_repository:
+        class: App\Infrastructure\BoardRepositoryRepository
+
+    app.infrastructure.presenter.board_presenter:
+        class: App\Infrastructure\Presenter\BoardPresenter

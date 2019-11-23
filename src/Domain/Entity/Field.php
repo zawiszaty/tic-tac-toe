@@ -4,30 +4,16 @@ declare(strict_types=1);
 
 namespace App\Domain\Entity;
 
-use App\Domain\Exception\BusyBoardException;
+use App\Domain\Exception\BusyFieldException;
 use App\Domain\ValueObject\Player;
 
-class BoardEntity
+class Field
 {
-    /**
-     * @var bool
-     */
-    private $busy;
-
-    /**
-     * @var Player|null
-     */
     private $player;
-
-    public function __construct()
-    {
-        $this->busy = false;
-        $this->player = null;
-    }
 
     public function isBusy(): bool
     {
-        return $this->busy;
+        return !empty($this->player);
     }
 
     public function getPlayer(): ?Player
@@ -38,9 +24,8 @@ class BoardEntity
     public function choseField(Player $player): void
     {
         if ($this->isBusy()) {
-            throw new BusyBoardException();
+            throw new BusyFieldException();
         }
-        $this->busy = true;
         $this->player = $player;
     }
 }

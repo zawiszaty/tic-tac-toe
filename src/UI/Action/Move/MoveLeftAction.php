@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Policy\Move;
+namespace App\UI\Action\Move;
 
-use App\Domain\Exception\MoveException;
 use App\Domain\ValueObject\SelectedField;
 
-final class MoveLeftPolicy implements MovePolicyInterface
+final class MoveLeftAction implements MoveActionInterface
 {
     public function move(SelectedField $selectedField): SelectedField
     {
@@ -17,6 +16,6 @@ final class MoveLeftPolicy implements MovePolicyInterface
             return new SelectedField($x, $selectedField->getY());
         }
 
-        throw MoveException::fromCannotMove('left');
+        throw MoveException::fromCannotMove();
     }
 }

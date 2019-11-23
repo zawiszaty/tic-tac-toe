@@ -4,58 +4,35 @@ declare(strict_types=1);
 
 namespace App\Domain;
 
-use App\Domain\Entity\BoardEntity;
+use App\Domain\Entity\Field;
+use App\Domain\Exception\MoveException;
 use App\Domain\Exception\WinnerException;
-use App\Domain\Policy\Move\MovePolicyInterface;
-use App\Domain\ValueObject\BoardView;
+use App\Domain\ValueObject\BoardSize;
 use App\Domain\ValueObject\Player;
 use App\Domain\ValueObject\SelectedField;
 
 class Board
 {
-    private $entities;
+    private $fields;
 
     private $selectedField;
 
     private $currentPlayer;
 
-    public function __construct()
+    private $boardSize;
+
+    public function __construct(BoardSize $boardSize)
     {
+        $this->boardSize     = $boardSize;
         $this->selectedField = new SelectedField(0, 0);
-        $this->entities = [
-            [new BoardEntity(), new BoardEntity(), new BoardEntity()],
-            [new BoardEntity(), new BoardEntity(), new BoardEntity()],
-            [new BoardEntity(), new BoardEntity(), new BoardEntity()],
-        ];
+        $this->fields        = $this->createEntities();
         $this->currentPlayer = Player::PLAYER_X();
-    }
-
-    public function draw(): BoardView
-    {
-        return new BoardView(
-            $this->prepareForDrawing(),
-            $this->selectedField,
-            $this->currentPlayer,
-        );
-    }
-
-    private function prepareForDrawing(): array
-    {
-        $entities = array_map(function (array $entity) {
-            $data = array_map(function (BoardEntity $boardEntity) {
-                return $boardEntity->getPlayer();
-            }, $entity);
-
-            return $data;
-        }, $this->entities);
-
-        return $entities;
     }
 
     public function selectField(): void
     {
-        /** @var BoardEntity $entity */
-        $entity = $this->entities[$this->selectedField->getX()][$this->selectedField->getY()];
+        /** @var Field $entity */
+        $entity = $this->fields[$this->selectedField->getY()][$this->selectedField->getX()];
         $entity->choseField($this->currentPlayer);
         $this->checkIfWin();
         $this->changePlayer();
@@ -63,66 +40,46 @@ class Board
 
     private function checkIfWin(): void
     {
-        if (false === empty($this->entities[0][0]->getPlayer()) && false === empty($this->entities[0][1]->getPlayer()) && false === empty($this->entities[0][2]->getPlayer())) {
-            if ($this->entities[0][0]->getPlayer()->equals($this->currentPlayer) &&
-                $this->entities[0][1]->getPlayer()->equals($this->currentPlayer) &&
-                $this->entities[0][2]->getPlayer()->equals($this->currentPlayer)) {
-                throw new WinnerException($this->currentPlayer);
+        $result = [];
+
+        foreach ($this->fields as $i => $row)
+        {
+            foreach ($row as $j => $cell)
+            {
+                if (null === $cell->getPlayer())
+                {
+                    $result[$i][$j] = 0;
+                }
+                else
+                {
+                    $result[$i][$j] = $cell->getPlayer()->equals($this->currentPlayer) ? 1 : 0;
+                }
             }
         }
 
-        if (false === empty($this->entities[1][0]->getPlayer()) && false === empty($this->entities[1][1]->getPlayer()) && false === empty($this->entities[1][2]->getPlayer())) {
-            if ($this->entities[1][0]->getPlayer()->equals($this->currentPlayer) &&
-                $this->entities[1][1]->getPlayer()->equals($this->currentPlayer) &&
-                $this->entities[1][2]->getPlayer()->equals($this->currentPlayer)) {
-                throw new WinnerException($this->currentPlayer);
-            }
+        $this->sumRowPlayer($result);
+
+        $result = array_map(null, ...$result);
+
+        $this->sumRowPlayer($result);
+
+        if (3 === $result[0][0] + $result[1][1] + $result[2][2])
+        {
+            throw new WinnerException($this->currentPlayer);
         }
 
-        if (false === empty($this->entities[2][0]->getPlayer()) && false === empty($this->entities[2][1]->getPlayer()) && false === empty($this->entities[2][2]->getPlayer())) {
-            if ($this->entities[2][0]->getPlayer()->equals($this->currentPlayer) &&
-                $this->entities[2][1]->getPlayer()->equals($this->currentPlayer) &&
-                $this->entities[2][2]->getPlayer()->equals($this->currentPlayer)) {
-                throw new WinnerException($this->currentPlayer);
-            }
+        if (3 === $result[0][2] + $result[1][1] + $result[2][0])
+        {
+            throw new WinnerException($this->currentPlayer);
         }
+    }
 
-        if (false === empty($this->entities[0][0]->getPlayer()) && false === empty($this->entities[1][0]->getPlayer()) && false === empty($this->entities[2][0]->getPlayer())) {
-            if ($this->entities[0][0]->getPlayer()->equals($this->currentPlayer) &&
-                $this->entities[1][0]->getPlayer()->equals($this->currentPlayer) &&
-                $this->entities[2][0]->getPlayer()->equals($this->currentPlayer)) {
-                throw new WinnerException($this->currentPlayer);
-            }
-        }
-
-        if (false === empty($this->entities[0][1]->getPlayer()) && false === empty($this->entities[1][1]->getPlayer()) && false === empty($this->entities[2][1]->getPlayer())) {
-            if ($this->entities[0][1]->getPlayer()->equals($this->currentPlayer) &&
-                $this->entities[1][1]->getPlayer()->equals($this->currentPlayer) &&
-                $this->entities[2][1]->getPlayer()->equals($this->currentPlayer)) {
-                throw new WinnerException($this->currentPlayer);
-            }
-        }
-
-        if (false === empty($this->entities[0][2]->getPlayer()) && false === empty($this->entities[1][2]->getPlayer()) && false === empty($this->entities[2][2]->getPlayer())) {
-            if ($this->entities[0][2]->getPlayer()->equals($this->currentPlayer) &&
-                $this->entities[1][2]->getPlayer()->equals($this->currentPlayer) &&
-                $this->entities[2][2]->getPlayer()->equals($this->currentPlayer)) {
-                throw new WinnerException($this->currentPlayer);
-            }
-        }
-
-        if (false === empty($this->entities[0][0]->getPlayer()) && false === empty($this->entities[1][1]->getPlayer()) && false === empty($this->entities[2][2]->getPlayer())) {
-            if ($this->entities[0][0]->getPlayer()->equals($this->currentPlayer) &&
-                $this->entities[1][1]->getPlayer()->equals($this->currentPlayer) &&
-                $this->entities[2][2]->getPlayer()->equals($this->currentPlayer)) {
-                throw new WinnerException($this->currentPlayer);
-            }
-        }
-
-        if (false === empty($this->entities[0][2]->getPlayer()) && false === empty($this->entities[1][1]->getPlayer()) && false === empty($this->entities[2][0]->getPlayer())) {
-            if ($this->entities[0][2]->getPlayer()->equals($this->currentPlayer) &&
-                $this->entities[1][1]->getPlayer()->equals($this->currentPlayer) &&
-                $this->entities[2][0]->getPlayer()->equals($this->currentPlayer)) {
+    private function sumRowPlayer(array $result)
+    {
+        foreach ($result as $item)
+        {
+            if (3 === array_sum($item))
+            {
                 throw new WinnerException($this->currentPlayer);
             }
         }
@@ -137,8 +94,47 @@ class Board
         }
     }
 
-    public function move(MovePolicyInterface $movePolicy): void
+    public function move(SelectedField $selectedField): void
     {
-        $this->selectedField = $movePolicy->move($this->selectedField);
+        if (
+            $selectedField->getX() > ($this->boardSize->getX() - 1)
+            || $selectedField->getX() < 0
+            || $selectedField->getY() > ($this->boardSize->getY() - 1)
+            || $selectedField->getY() < 0
+        )
+        {
+            throw MoveException::fromCannotMove();
+        }
+        $this->selectedField = $selectedField;
+    }
+
+    public function getFields(): array
+    {
+        return $this->fields;
+    }
+
+    public function getSelectedField(): SelectedField
+    {
+        return $this->selectedField;
+    }
+
+    public function getCurrentPlayer(): Player
+    {
+        return $this->currentPlayer;
+    }
+
+    private function createEntities(): array
+    {
+        $entities = [];
+
+        for ($i = 0; $i < $this->boardSize->getY(); $i++)
+        {
+            for ($j = 0; $j < $this->boardSize->getX(); $j++)
+            {
+                $entities[$i][] = new Field();
+            }
+        }
+
+        return $entities;
     }
 }

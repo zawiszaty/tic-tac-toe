@@ -1,12 +1,11 @@
 <?php
-
 declare(strict_types=1);
 
-namespace App\Domain\Exception;
 
-use RuntimeException;
+namespace App\UI\Action\Move;
 
-final class MoveException extends RuntimeException
+
+final class MoveException extends \RuntimeException
 {
     public static function fromCannotMove(): self
     {

@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\ValueObject;
+namespace App\Infrastructure\Presenter;
+
+use App\Domain\ValueObject\Player;
+use App\Domain\ValueObject\SelectedField;
 
 final class BoardView
 {

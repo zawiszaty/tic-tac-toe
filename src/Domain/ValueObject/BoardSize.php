@@ -1,10 +1,11 @@
 <?php
-
 declare(strict_types=1);
+
 
 namespace App\Domain\ValueObject;
 
-final class SelectedField
+
+final class BoardSize
 {
     private $x;
 
